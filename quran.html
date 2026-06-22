@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hifz AI Pro - Full Quran Cloud Edition</title>
+    <style>
+        /* === PRO LEVEL UI/UX DESIGN === */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        body {
+            background-color: var(--bg-dark); color: var(--text-main);
+            display: flex; justify-content: center; min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%; max-width: 480px; background: var(--bg-dark);
+            position: relative; overflow-x: hidden;
+            display: flex; flex-direction: column; height: 100vh;
+        }
+
+        /* Top Header */
+        .header {
+            padding: 20px; text-align: center; border-bottom: 1px solid var(--border);
+            background: var(--bg-card); position: sticky; top: 0; z-index: 10;
+        }
+        .header h1 { font-size: 22px; color: var(--primary); font-weight: 700; }
+
+        /* Views */
+        .view { display: none; flex: 1; padding: 20px; overflow-y: auto; }
+        .view.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Tabs & Search */
+        .nav-tabs {
+            display: flex; background: var(--bg-card); border-radius: 8px;
+            margin-bottom: 15px; overflow: hidden; border: 1px solid var(--border);
+        }
+        .tab-btn {
+            flex: 1; padding: 12px; background: transparent; color: var(--text-muted);
+            border: none; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .search-box {
+            width: 100%; padding: 14px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-card); color: white; margin-bottom: 20px; outline: none;
+            font-size: 16px;
+        }
+        .search-box:focus { border-color: var(--primary); }
+
+        /* Lists */
+        .list-container { display: flex; flex-direction: column; gap: 10px; }
+        .list-item {
+            background: var(--bg-card); padding: 15px; border-radius: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; border: 1px solid var(--border); transition: 0.2s;
+        }
+        .list-item:hover { border-color: var(--primary); }
+        .list-item .arabic-name { font-size: 20px; color: var(--primary); font-family: 'Traditional Arabic', serif; }
+
+        /* Recitation View */
+        .quran-board {
+            background: #022c22; border: 1px solid #065f46; border-radius: 12px;
+            padding: 20px; direction: rtl; text-align: right; min-height: 200px;
+            font-size: 28px; line-height: 1.8; font-family: 'Traditional Arabic', serif;
+            margin-bottom: 20px;
+        }
+        .word { display: inline-block; margin: 0 4px; color: var(--text-main); transition: 0.2s; }
+        .word.highlight { color: #facc15; border-bottom: 2px solid #facc15; }
+        .word.correct { color: #4ade80; }
+        .word.wrong { color: var(--danger); text-decoration: line-through; }
+
+        /* Controls */
+        .controls { display: flex; flex-direction: column; gap: 15px; }
+        .btn {
+            padding: 15px; border-radius: 8px; border: none; font-size: 16px;
+            font-weight: bold; cursor: pointer; text-align: center; color: white;
+            transition: 0.2s;
+        }
+        .btn-primary { background: var(--primary); }
+        .btn-danger { background: var(--danger); }
+        .btn-secondary { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); }
+        
+        .status-box {
+            background: var(--bg-card); padding: 15px; border-radius: 8px;
+            font-size: 14px; color: var(--text-muted); text-align: center; border: 1px solid var(--border);
+        }
+
+        /* Loader */
+        .loader { text-align: center; padding: 20px; color: var(--primary); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>Hifz AI Pro 📖</h1>
+    </div>
+
+    <div id="view-explorer" class="view active">
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tab-surah" onclick="App.switchTab('surah')">Surahs</button>
+            <button class="tab-btn" id="tab-juz" onclick="App.switchTab('juz')">Paras (Juz)</button>
+        </div>
+
+        <input type="text" id="search-input" class="search-box" placeholder="Search Surah (e.g., Fatiha, Yaseen)..." onkeyup="App.filterList()">
+
+        <div id="loading-indicator" class="loader">Fetching Quran Data from Cloud... ⏳</div>
+        
+        <div id="quran-list" class="list-container">
+            </div>
+    </div>
+
+    <div id="view-recitation" class="view">
+        <h2 id="recitation-title" style="margin-bottom: 15px; font-size: 18px; text-align: center;">Loading...</h2>
+        
+        <div id="quran-board" class="quran-board">
+            </div>
+
+        <div class="status-box">
+            <strong id="mic-status">Microphone Idle</strong>
+            <div id="live-text" style="margin-top: 5px; color: #facc15; font-style: italic;">Waiting for voice...</div>
+        </div>
+
+        <div class="controls" style="margin-top: 20px;">
+            <button id="btn-start" class="btn btn-primary" onclick="App.startMic()">🎤 Start Reciting</button>
+            <button id="btn-stop" class="btn btn-danger" style="display: none;" onclick="App.stopMic()">🛑 Stop</button>
+            <button class="btn btn-secondary" onclick="App.goBack()">🔙 Back to Explorer</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const App = {
+        surahsData: [],
+        juzData: [],
+        currentMode: 'surah', // 'surah' or 'juz'
+        recognition: null,
+        targetWords: [],
+        currentWordIndex: 0,
+
+        init: async () => {
+            await App.fetchSurahList();
+            App.setupSpeechEngine();
+        },
+
+        // API Call to get all 114 Surahs
+        fetchSurahList: async () => {
+            try {
+                const response = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await response.json();
+                App.surahsData = data.data;
+                
+                // Pre-fill fake Juz data just for UI demonstration (A real API needs multiple calls for Juz)
+                for(let i=1; i<=30; i++) {
+                    App.juzData.push({ number: i, englishName: `Para / Juz ${i}` });
+                }
+
+                document.getElementById('loading-indicator').style.display = 'none';
+                App.renderList();
+            } catch (error) {
+                document.getElementById('loading-indicator').innerText = "Failed to connect to Internet/API ❌";
+            }
+        },
+
+        switchTab: (mode) => {
+            App.currentMode = mode;
+            document.getElementById('tab-surah').classList.toggle('active', mode === 'surah');
+            document.getElementById('tab-juz').classList.toggle('active', mode === 'juz');
+            document.getElementById('search-input').placeholder = mode === 'surah' ? "Search Surah..." : "Search Para...";
+            App.renderList();
+        },
+
+        renderList: (filterQuery = "") => {
+            const container = document.getElementById('quran-list');
+            container.innerHTML = "";
+            const dataToRender = App.currentMode === 'surah' ? App.surahsData : App.juzData;
+
+            dataToRender.forEach(item => {
+                const nameToMatch = item.englishName.toLowerCase();
+                if(nameToMatch.includes(filterQuery.toLowerCase())) {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    if(App.currentMode === 'surah') {
+                        div.innerHTML = `
+                            <div>
+                                <strong>${item.number}. ${item.englishName}</strong>
+                                <div style="font-size: 12px; color: var(--text-muted);">${item.revelationType} • ${item.numberOfAyahs} Ayahs</div>
+                            </div>
+                            <div class="arabic-name">${item.name}</div>
+                        `;
+                        div.onclick = () => App.openSurah(item.number, item.englishName);
+                    } else {
+                        div.innerHTML = `<div><strong>${item.englishName}</strong></div>`;
+                        div.onclick = () => alert("Para fetching requires pagination API. Currently showing Surahs for demo!");
+                    }
+                    container.appendChild(div);
+                }
+            });
+        },
+
+        filterList: () => {
+            const query = document.getElementById('search-input').value;
+            App.renderList(query);
+        },
+
+        openSurah: async (surahNumber, surahName) => {
+            document.getElementById('view-explorer').classList.remove('active');
+            document.getElementById('view-recitation').classList.add('active');
+            document.getElementById('recitation-title').innerText = `Loading ${surahName}...`;
+            document.getElementById('quran-board').innerHTML = "<div style='text-align:center; font-size:16px;'>Fetching Ayahs...</div>";
+
+            try {
+                const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+                const data = await response.json();
+                App.targetWords = [];
+                App.currentWordIndex = 0;
+                
+                const board = document.getElementById('quran-board');
+                board.innerHTML = "";
+
+                // Flatten all Ayahs into an array of words
+                let globalWordIndex = 0;
+                data.data.ayahs.forEach(ayah => {
+                    const words = ayah.text.split(' ');
+                    words.forEach(w => {
+                        App.targetWords.push(w);
+                        const span = document.createElement('span');
+                        span.className = 'word';
+                        span.id = `w-${globalWordIndex}`;
+                        span.innerText = w;
+                        board.appendChild(span);
+                        globalWordIndex++;
+                    });
+                    // Add Ayah marker
+                    board.innerHTML += ` <span style="color:#10b981; font-size:20px;">(${ayah.numberInSurah})</span> `;
+                });
+
+                document.getElementById('recitation-title').innerText = surahName;
+                App.highlightCurrentWord();
+
+            } catch(e) {
+                document.getElementById('quran-board').innerHTML = "Error loading Surah data.";
+            }
+        },
+
+        goBack: () => {
+            App.stopMic();
+            document.getElementById('view-recitation').classList.remove('active');
+            document.getElementById('view-explorer').classList.add('active');
+        },
+
+        highlightCurrentWord: () => {
+            document.querySelectorAll('.word').forEach(el => el.classList.remove('highlight'));
+            const currentEl = document.getElementById(`w-${App.currentWordIndex}`);
+            if(currentEl) {
+                currentEl.classList.add('highlight');
+                // Auto scroll to current word
+                currentEl.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        },
+
+        // SPEECH ENGINE (Pro Setup)
+        setupSpeechEngine: () => {
+            const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechAPI) {
+                document.getElementById('mic-status').innerText = "⚠️ Browser not supported.";
+                return;
+            }
+            App.recognition = new SpeechAPI();
+            App.recognition.continuous = true;
+            App.recognition.interimResults = true;
+            App.recognition.lang = 'ar-SA'; // Strict Arabic
+
+            App.recognition.onstart = () => {
+                document.getElementById('mic-status').innerText = "🎙️ Listening Live...";
+                document.getElementById('mic-status').style.color = "#4ade80";
+                document.getElementById('btn-start').style.display = "none";
+                document.getElementById('btn-stop').style.display = "block";
+            };
+
+            App.recognition.onend = () => {
+                document.getElementById('mic-status').innerText = "Microphone Idle";
+                document.getElementById('mic-status').style.color = "var(--text-muted)";
+                document.getElementById('btn-start').style.display = "block";
+                document.getElementById('btn-stop').style.display = "none";
+            };
+
+            App.recognition.onerror = (event) => {
+                let errorMsg = event.error;
+                if(event.error === 'not-allowed') {
+                    errorMsg = "Mic Blocked! Ensure website is running on HTTPS://";
+                }
+                document.getElementById('mic-status').innerText = "❌ Error: " + errorMsg;
+                App.stopMic();
+            };
+
+            App.recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    transcript += event.results[i][0].transcript;
+                }
+                const liveText = transcript.trim();
+                document.getElementById('live-text').innerText = liveText || "Waiting for voice...";
+                if(liveText) App.checkRecitationLogic(liveText);
+            };
+        },
+
+        startMic: () => { if(App.recognition) App.recognition.start(); },
+        stopMic: () => { if(App.recognition) App.recognition.stop(); },
+
+        checkRecitationLogic: (spokenSentence) => {
+            if(App.currentWordIndex >= App.targetWords.length) return;
+
+            const spokenArray = spokenSentence.split(/\s+/);
+            const lastSpoken = spokenArray[spokenArray.length - 1];
+            const targetWord = App.targetWords[App.currentWordIndex];
+
+            // Real AI logic requires NLP, here we do a smart string inclusion matching
+            if(lastSpoken.length > 2 && (targetWord.includes(lastSpoken) || lastSpoken.includes(targetWord))) {
+                const el = document.getElementById(`w-${App.currentWordIndex}`);
+                if(el) { el.classList.remove('highlight'); el.classList.add('correct'); }
+                App.currentWordIndex++;
+                App.highlightCurrentWord();
+            }
+        }
+    };
+
+    window.onload = App.init;
+</script>
+</body>
+</html>
