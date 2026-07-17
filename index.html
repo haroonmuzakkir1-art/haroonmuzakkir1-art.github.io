@@ -5,131 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SK Enterprises - Ultra Premium Hub</title>
     <style>
-        /* Base Setup - Enforcing strict boundaries */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #05070a; color: #ffffff; height: 100vh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
         
-        body { 
-            background-color: #05070a; 
-            color: #ffffff; 
-            height: 100vh; 
-            width: 100vw;
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        .main-container { display: flex; height: calc(100vh - 45px); width: 100vw; }
         
-        /* Layout: Split strictly into Left (Clocks) and Right (Video) */
-        .main-container { 
-            display: flex; 
-            flex: 1; /* Takes all remaining height above the ticker */
-            width: 100vw; 
-            overflow: hidden; 
-        }
-        
-        /* Left Panel - Fixed minimum width to prevent overlapping */
         .left-panel { 
-            width: 32%; /* Takes ~32% of screen */
-            min-width: 420px; /* CRITICAL: Prevents panel from squishing on TV */
-            max-width: 500px;
-            padding: 15px; 
+            width: 380px; 
+            flex-shrink: 0; 
+            padding: 12px; 
             display: flex; 
             flex-direction: column; 
             justify-content: space-between; 
             background: radial-gradient(circle at top left, #121822, #05070a); 
             border-right: 2px solid #d4af37; 
             z-index: 10; 
-            flex-shrink: 0; /* Prevents this panel from shrinking */
         }
         
-        /* Panel Headers and Footers */
-        .panel-header, .panel-footer { 
-            text-align: center; 
-            padding: 15px; 
-            background: rgba(212, 175, 55, 0.03); 
-            border: 1px solid rgba(212, 175, 55, 0.2); 
-            border-radius: 15px; 
-            box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.05); 
-        }
-        .panel-header h2 { color: #d4af37; font-size: 1.2rem; letter-spacing: 3px; font-weight: 800; text-transform: uppercase; }
-        .panel-footer p { color: #8b949e; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
-        .panel-footer .highlight { color: #d4af37; font-weight: 700; font-size: 1.1rem; }
+        .panel-header, .panel-footer { text-align: center; padding: 8px; background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.05); }
+        .panel-header h2 { color: #d4af37; font-size: 1.1rem; letter-spacing: 2px; font-weight: 800; text-transform: uppercase; }
+        .panel-footer p { color: #8b949e; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+        .panel-footer .highlight { color: #d4af37; font-weight: 700; font-size: 1rem; }
 
-        /* Clocks Grid */
-        .clocks-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 15px; /* Slightly adjusted gap for better fit */
-        }
+        .clocks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        /* Right Panel - Video section taking remaining space */
-        .right-panel { 
-            flex: 1; /* Takes all remaining width left over by the left-panel */
-            background: #000; 
-            position: relative; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            cursor: pointer; 
-            overflow: hidden; /* Stops video from leaking */
-        }
+        .right-panel { flex: 1; background: #000; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; }
         
-        /* Video settings - 'contain' stops logo from getting cropped */
-        video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            opacity: 0.95; 
-        }
+        /* 'cover' removes black bars and fills the screen */
+        video { width: 100%; height: 100%; object-fit: cover; opacity: 0.95; }
         
-        /* Status Indicator (Top Right) */
-        .status { position: absolute; top: 25px; right: 25px; display: flex; align-items: center; gap: 10px; font-size: 1rem; color: #d4af37; font-weight: 700; letter-spacing: 1px; z-index: 100; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.4); backdrop-filter: blur(5px); }
-        .dot { width: 12px; height: 12px; background: #3fb950; border-radius: 50%; animation: blink 1.2s infinite; box-shadow: 0 0 10px #3fb950; }
+        .status { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #d4af37; font-weight: 700; letter-spacing: 1px; z-index: 100; background: rgba(0,0,0,0.7); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.4); backdrop-filter: blur(5px); }
+        .dot { width: 10px; height: 10px; background: #3fb950; border-radius: 50%; animation: blink 1.2s infinite; box-shadow: 0 0 10px #3fb950; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        /* Fullscreen Toggle Button (Bottom Right) */
-        .fullscreen-btn { position: absolute; bottom: 25px; right: 25px; font-size: 1.5rem; color: #ffffff; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); padding: 10px 15px; border-radius: 10px; z-index: 100; cursor: pointer; transition: 0.3s; }
+        .fullscreen-btn { position: absolute; bottom: 20px; right: 20px; font-size: 1.2rem; color: #ffffff; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); padding: 8px 12px; border-radius: 10px; z-index: 100; cursor: pointer; transition: 0.3s; }
         .fullscreen-btn:hover { background: rgba(212, 175, 55, 0.5); border-color: #d4af37; }
 
-        /* Premium Clocks Styling */
-        .clock-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .city-name { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #d4af37; margin-bottom: 10px; text-transform: uppercase; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+        .clock-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 5px 10px rgba(0,0,0,0.5); }
+        .city-name { font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; color: #d4af37; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
         
-        /* Analog Clock */
-        .analog-clock { width: 125px; height: 125px; border: 2px solid #1f2937; border-radius: 50%; position: relative; background: radial-gradient(circle, #0d1117, #010409); box-shadow: 0 0 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(212, 175, 55, 0.1); margin-bottom: 12px; }
-        .center-dot { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #d4af37; border-radius: 50%; transform: translate(-50%, -50%); z-index: 10; box-shadow: 0 0 5px #d4af37; }
-        
-        /* Clock Numbers */
-        .clock-number { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; text-align: center; font-size: 0.8rem; font-weight: 700; color: #6e7681; z-index: 2; }
-        
-        /* Hands */
+        /* 100px Clocks to prevent cutting off at the bottom */
+        .analog-clock { width: 100px; height: 100px; border: 2px solid #1f2937; border-radius: 50%; position: relative; background: radial-gradient(circle, #0d1117, #010409); box-shadow: 0 0 10px rgba(0,0,0,0.8), inset 0 0 10px rgba(212, 175, 55, 0.1); margin-bottom: 10px; }
+        .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #d4af37; border-radius: 50%; transform: translate(-50%, -50%); z-index: 10; box-shadow: 0 0 5px #d4af37; }
+        .clock-number { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; text-align: center; font-size: 0.75rem; font-weight: 700; color: #6e7681; z-index: 2; }
         .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 5; }
-        .hour-hand { width: 4px; height: 32px; background: #e6edf3; margin-left: -2px; }
-        .min-hand { width: 3px; height: 45px; background: #8b949e; margin-left: -1.5px; }
-        .sec-hand { width: 2px; height: 50px; background: #d4af37; margin-left: -1px; z-index: 6; }
+        .hour-hand { width: 3px; height: 25px; background: #e6edf3; margin-left: -1.5px; }
+        .min-hand { width: 2px; height: 35px; background: #8b949e; margin-left: -1px; }
+        .sec-hand { width: 1.5px; height: 40px; background: #d4af37; margin-left: -0.75px; z-index: 6; }
         
-        /* Digital Clock & Date */
         .digital-wrapper { text-align: center; }
-        .digital-clock { font-size: 1.3rem; font-weight: 800; color: #ffffff; display: flex; align-items: baseline; justify-content: center; gap: 4px; }
-        .ampm { font-size: 0.85rem; color: #d4af37; }
-        .date-display { font-size: 0.8rem; color: #8b949e; font-weight: 600; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase; }
+        .digital-clock { font-size: 1.1rem; font-weight: 800; color: #ffffff; display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+        .ampm { font-size: 0.75rem; color: #d4af37; }
+        .date-display { font-size: 0.75rem; color: #8b949e; font-weight: 600; letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
         
-        /* Branding Ticker (Bottom Bar) */
-        .ticker-wrap { width: 100%; height: 45px; flex-shrink: 0; background: #010409; border-top: 1px solid #30363d; overflow: hidden; display: flex; align-items: center; white-space: nowrap; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
+        .ticker-wrap { width: 100vw; height: 45px; flex-shrink: 0; background: #010409; border-top: 1px solid #30363d; overflow: hidden; display: flex; align-items: center; white-space: nowrap; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
         .ticker-inner { display: flex; width: max-content; animation: smoothTicker 35s linear infinite; will-change: transform; }
         @keyframes smoothTicker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
         .ticker-item { display: inline-block; padding: 0 40px; color: #c9d1d9; font-weight: 700; font-size: 1.1rem; }
         .gold-text { color: #d4af37; }
+
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; height: auto; overflow: visible; }
+            .left-panel { width: 100%; flex-shrink: unset; }
+            .right-panel { height: 300px; }
+            body { height: auto; overflow-y: auto; }
+        }
     </style>
 </head>
 <body>
-
     <div class="main-container">
         <div class="left-panel">
-            
-            <div class="panel-header">
-                <h2>Global Desk</h2>
-            </div>
-
+            <div class="panel-header"><h2>Global Desk</h2></div>
             <div class="clocks-grid">
                 <div class="clock-card" id="ind-card">
                     <div class="city-name">India</div>
@@ -152,19 +97,15 @@
                     <div class="digital-wrapper"><div class="digital-clock"><span id="tok-time">--:--:--</span> <span class="ampm" id="tok-ampm">--</span></div><div class="date-display" id="tok-date">---</div></div>
                 </div>
             </div>
-
             <div class="panel-footer">
                 <p>Your Partner In</p>
                 <div class="highlight">FINANCIAL GROWTH</div>
             </div>
-
         </div>
 
         <div class="right-panel" onclick="togglePlayPause()" tabindex="0">
             <div class="status"><div class="dot"></div> SK ENTERPRISES LIVE</div>
-            
             <div class="fullscreen-btn" onclick="event.stopPropagation(); toggleFullScreen();" title="Toggle Fullscreen">⛶</div>
-            
             <video id="promo-video" src="./sk_video.mp4" autoplay loop muted playsinline></video>
         </div>
     </div>
@@ -190,7 +131,6 @@
             { id: 'tok', tz: 'Asia/Tokyo' }
         ];
 
-        // Generate Numbers (1 to 12) for Analog Clocks
         function setupClockNumbers() {
             const clocks = document.querySelectorAll('.analog-clock');
             clocks.forEach(clock => {
@@ -198,14 +138,12 @@
                     let num = document.createElement('div');
                     num.className = 'clock-number';
                     num.innerText = i;
-                    // Adjusted radius (-48px) for the bigger clock
-                    num.style.transform = `rotate(${i * 30}deg) translate(0, -48px) rotate(-${i * 30}deg)`;
+                    num.style.transform = `rotate(${i * 30}deg) translate(0, -38px) rotate(-${i * 30}deg)`;
                     clock.appendChild(num);
                 }
             });
         }
 
-        // Update Clocks & Dates
         function updateClocks() {
             const now = new Date();
             zones.forEach(zone => {
@@ -227,26 +165,16 @@
             });
         }
 
-        // Play/Pause Logic
         function togglePlayPause() {
             const video = document.getElementById('promo-video');
-            if (video.paused) {
-                video.play();
-            } else {
-                video.pause();
-            }
+            if (video.paused) { video.play(); } else { video.pause(); }
         }
 
-        // Maximize/Minimize Fullscreen Logic
         function toggleFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error: ${err.message}`);
-                });
+                document.documentElement.requestFullscreen().catch(err => { console.log(`Error: ${err.message}`); });
             } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
+                if (document.exitFullscreen) { document.exitFullscreen(); }
             }
         }
 
