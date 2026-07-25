@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Enterprises - Ultra Premium Hub</title>
+    <style>
+        /* Base Setup */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #05070a; color: #ffffff; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Layout: 30% Left (Clocks), 70% Right (Video) */
+        .main-container { display: flex; height: calc(100vh - 45px); width: 100%; }
+        
+        /* Left Panel - Flex Column to manage empty space */
+        .left-panel { width: 30%; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; background: radial-gradient(circle at top left, #121822, #05070a); border-right: 2px solid #d4af37; z-index: 10; }
+        
+        /* Panel Headers and Footers to fill vertical space */
+        .panel-header, .panel-footer { text-align: center; padding: 15px; background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 15px; box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.05); }
+        .panel-header h2 { color: #d4af37; font-size: 1.2rem; letter-spacing: 3px; font-weight: 800; text-transform: uppercase; }
+        .panel-footer p { color: #8b949e; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+        .panel-footer .highlight { color: #d4af37; font-weight: 700; font-size: 1.1rem; }
+
+        /* Clocks Grid */
+        .clocks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .right-panel { width: 70%; background: #000; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        video { width: 100%; height: 100%; object-fit: cover; opacity: 0.95; }
+        
+        /* Status Indicator (Top Right) */
+        .status { position: absolute; top: 25px; right: 25px; display: flex; align-items: center; gap: 10px; font-size: 1rem; color: #d4af37; font-weight: 700; letter-spacing: 1px; z-index: 100; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.4); backdrop-filter: blur(5px); }
+        .dot { width: 12px; height: 12px; background: #3fb950; border-radius: 50%; animation: blink 1.2s infinite; box-shadow: 0 0 10px #3fb950; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Fullscreen Toggle Button (Bottom Right) */
+        .fullscreen-btn { position: absolute; bottom: 25px; right: 25px; font-size: 1.5rem; color: #ffffff; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); padding: 10px 15px; border-radius: 10px; z-index: 100; cursor: pointer; transition: 0.3s; }
+        .fullscreen-btn:hover { background: rgba(212, 175, 55, 0.5); border-color: #d4af37; }
+
+        /* Premium Clocks Styling */
+        .clock-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 15px; padding: 15px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .city-name { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: #d4af37; margin-bottom: 15px; text-transform: uppercase; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
+        
+        /* Analog Clock (Size Increased Slightly) */
+        .analog-clock { width: 125px; height: 125px; border: 2px solid #1f2937; border-radius: 50%; position: relative; background: radial-gradient(circle, #0d1117, #010409); box-shadow: 0 0 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(212, 175, 55, 0.1); margin-bottom: 15px; }
+        .center-dot { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #d4af37; border-radius: 50%; transform: translate(-50%, -50%); z-index: 10; box-shadow: 0 0 5px #d4af37; }
+        
+        /* Clock Numbers */
+        .clock-number { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; text-align: center; font-size: 0.8rem; font-weight: 700; color: #6e7681; z-index: 2; }
+        
+        /* Hands */
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom; border-radius: 4px; z-index: 5; }
+        .hour-hand { width: 4px; height: 32px; background: #e6edf3; margin-left: -2px; }
+        .min-hand { width: 3px; height: 45px; background: #8b949e; margin-left: -1.5px; }
+        .sec-hand { width: 2px; height: 50px; background: #d4af37; margin-left: -1px; z-index: 6; }
+        
+        /* Digital Clock & Date */
+        .digital-wrapper { text-align: center; }
+        .digital-clock { font-size: 1.3rem; font-weight: 800; color: #ffffff; display: flex; align-items: baseline; justify-content: center; gap: 4px; }
+        .ampm { font-size: 0.85rem; color: #d4af37; }
+        .date-display { font-size: 0.8rem; color: #8b949e; font-weight: 600; letter-spacing: 1px; margin-top: 5px; text-transform: uppercase; }
+        
+        /* Branding Ticker (Bottom Bar) */
+        .ticker-wrap { width: 100%; height: 45px; background: #010409; border-top: 1px solid #30363d; overflow: hidden; display: flex; align-items: center; white-space: nowrap; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
+        .ticker-inner { display: flex; width: max-content; animation: smoothTicker 35s linear infinite; will-change: transform; }
+        @keyframes smoothTicker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+        .ticker-item { display: inline-block; padding: 0 40px; color: #c9d1d9; font-weight: 700; font-size: 1.1rem; }
+        .gold-text { color: #d4af37; }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="left-panel">
+            
+            <div class="panel-header">
+                <h2>Global Desk</h2>
+            </div>
+
+            <div class="clocks-grid">
+                <div class="clock-card" id="ind-card">
+                    <div class="city-name">India</div>
+                    <div class="analog-clock" id="ind-analog"><div class="center-dot"></div><div class="hand hour-hand" id="ind-hour"></div><div class="hand min-hand" id="ind-min"></div><div class="hand sec-hand" id="ind-sec"></div></div>
+                    <div class="digital-wrapper"><div class="digital-clock"><span id="ind-time">--:--:--</span> <span class="ampm" id="ind-ampm">--</span></div><div class="date-display" id="ind-date">---</div></div>
+                </div>
+                <div class="clock-card" id="ny-card">
+                    <div class="city-name">New York</div>
+                    <div class="analog-clock" id="ny-analog"><div class="center-dot"></div><div class="hand hour-hand" id="ny-hour"></div><div class="hand min-hand" id="ny-min"></div><div class="hand sec-hand" id="ny-sec"></div></div>
+                    <div class="digital-wrapper"><div class="digital-clock"><span id="ny-time">--:--:--</span> <span class="ampm" id="ny-ampm">--</span></div><div class="date-display" id="ny-date">---</div></div>
+                </div>
+                <div class="clock-card" id="ldn-card">
+                    <div class="city-name">London</div>
+                    <div class="analog-clock" id="ldn-analog"><div class="center-dot"></div><div class="hand hour-hand" id="ldn-hour"></div><div class="hand min-hand" id="ldn-min"></div><div class="hand sec-hand" id="ldn-sec"></div></div>
+                    <div class="digital-wrapper"><div class="digital-clock"><span id="ldn-time">--:--:--</span> <span class="ampm" id="ldn-ampm">--</span></div><div class="date-display" id="ldn-date">---</div></div>
+                </div>
+                <div class="clock-card" id="tok-card">
+                    <div class="city-name">Tokyo</div>
+                    <div class="analog-clock" id="tok-analog"><div class="center-dot"></div><div class="hand hour-hand" id="tok-hour"></div><div class="hand min-hand" id="tok-min"></div><div class="hand sec-hand" id="tok-sec"></div></div>
+                    <div class="digital-wrapper"><div class="digital-clock"><span id="tok-time">--:--:--</span> <span class="ampm" id="tok-ampm">--</span></div><div class="date-display" id="tok-date">---</div></div>
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <p>Your Partner In</p>
+                <div class="highlight">FINANCIAL GROWTH</div>
+            </div>
+
+        </div>
+
+        <div class="right-panel" onclick="togglePlayPause()" tabindex="0">
+            <div class="status"><div class="dot"></div> SK ENTERPRISES LIVE</div>
+            
+            <div class="fullscreen-btn" onclick="event.stopPropagation(); toggleFullScreen();" title="Toggle Fullscreen">⛶</div>
+            
+            <video id="promo-video" src="./sk_video.mp4" autoplay loop muted playsinline></video>
+        </div>
+    </div>
+
+    <div class="ticker-wrap">
+        <div class="ticker-inner">
+            <span class="ticker-item">✦ WELCOME TO <span class="gold-text">SK ENTERPRISES</span> ✦</span>
+            <span class="ticker-item">YOUR PARTNER IN FINANCIAL GROWTH</span>
+            <span class="ticker-item">✦ GLOBAL MARKET HOURS ✦</span>
+            <span class="ticker-item">NIFTY 50 | BANK NIFTY | SENSEX | DOW JONES | NASDAQ | FOREX</span>
+            <span class="ticker-item">✦ WELCOME TO <span class="gold-text">SK ENTERPRISES</span> ✦</span>
+            <span class="ticker-item">YOUR PARTNER IN FINANCIAL GROWTH</span>
+            <span class="ticker-item">✦ GLOBAL MARKET HOURS ✦</span>
+            <span class="ticker-item">NIFTY 50 | BANK NIFTY | SENSEX | DOW JONES | NASDAQ | FOREX</span>
+        </div>
+    </div>
+
+    <script>
+        const zones = [
+            { id: 'ind', tz: 'Asia/Kolkata' },
+            { id: 'ny', tz: 'America/New_York' },
+            { id: 'ldn', tz: 'Europe/London' },
+            { id: 'tok', tz: 'Asia/Tokyo' }
+        ];
+
+        // Generate Numbers (1 to 12) for Analog Clocks
+        function setupClockNumbers() {
+            const clocks = document.querySelectorAll('.analog-clock');
+            clocks.forEach(clock => {
+                for (let i = 1; i <= 12; i++) {
+                    let num = document.createElement('div');
+                    num.className = 'clock-number';
+                    num.innerText = i;
+                    // Adjusted radius (-48px) for the slightly bigger clock
+                    num.style.transform = `rotate(${i * 30}deg) translate(0, -48px) rotate(-${i * 30}deg)`;
+                    clock.appendChild(num);
+                }
+            });
+        }
+
+        // Update Clocks & Dates
+        function updateClocks() {
+            const now = new Date();
+            zones.forEach(zone => {
+                const timeParts = new Intl.DateTimeFormat('en-US', { timeZone: zone.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).formatToParts(now);
+                let h = parseInt(timeParts.find(p => p.type === 'hour').value);
+                let m = parseInt(timeParts.find(p => p.type === 'minute').value);
+                let s = parseInt(timeParts.find(p => p.type === 'second').value);
+                let ampm = timeParts.find(p => p.type === 'dayPeriod').value;
+                
+                document.getElementById(`${zone.id}-time`).innerText = `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+                document.getElementById(`${zone.id}-ampm`).innerText = ampm;
+
+                const dateString = new Intl.DateTimeFormat('en-US', { timeZone: zone.tz, weekday: 'short', month: 'short', day: 'numeric' }).format(now);
+                document.getElementById(`${zone.id}-date`).innerText = dateString;
+
+                document.getElementById(`${zone.id}-hour`).style.transform = `rotate(${(h % 12) * 30 + (m * 0.5)}deg)`;
+                document.getElementById(`${zone.id}-min`).style.transform = `rotate(${m * 6}deg)`;
+                document.getElementById(`${zone.id}-sec`).style.transform = `rotate(${s * 6}deg)`;
+            });
+        }
+
+        // Play/Pause Logic (Icon removed, functionality remains)
+        function togglePlayPause() {
+            const video = document.getElementById('promo-video');
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        // Maximize/Minimize Fullscreen Logic
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        window.onload = () => {
+            setupClockNumbers(); 
+            updateClocks();      
+            setInterval(updateClocks, 1000); 
+        };
+    </script>
+</body>
+</html>
