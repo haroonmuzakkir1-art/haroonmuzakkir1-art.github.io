@@ -31,8 +31,18 @@
         
         .right-panel { flex: 1; background: #000; position: relative; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; }
         
-        /* 'cover' removes black bars and fills the screen */
-        video { width: 100%; height: 100%; object-fit: cover; opacity: 0.95; }
+        /* High Quality HD Video Settings & Hardware Acceleration for Smart TV */
+        video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            opacity: 1;
+            /* Forces TV Browser GPU Rendering for Sharp HD Quality */
+            image-rendering: -webkit-optimize-contrast;
+            transform: translateZ(0);
+            will-change: transform;
+            backface-visibility: hidden;
+        }
         
         .status { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #d4af37; font-weight: 700; letter-spacing: 1px; z-index: 100; background: rgba(0,0,0,0.7); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(212, 175, 55, 0.4); backdrop-filter: blur(5px); }
         .dot { width: 10px; height: 10px; background: #3fb950; border-radius: 50%; animation: blink 1.2s infinite; box-shadow: 0 0 10px #3fb950; }
@@ -43,7 +53,6 @@
         .clock-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 5px 10px rgba(0,0,0,0.5); }
         .city-name { font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px; color: #d4af37; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 0 10px rgba(212, 175, 55, 0.4); }
         
-        /* 100px Clocks to prevent cutting off at the bottom */
         .analog-clock { width: 100px; height: 100px; border: 2px solid #1f2937; border-radius: 50%; position: relative; background: radial-gradient(circle, #0d1117, #010409); box-shadow: 0 0 10px rgba(0,0,0,0.8), inset 0 0 10px rgba(212, 175, 55, 0.1); margin-bottom: 10px; }
         .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #d4af37; border-radius: 50%; transform: translate(-50%, -50%); z-index: 10; box-shadow: 0 0 5px #d4af37; }
         .clock-number { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin-top: -10px; margin-left: -10px; text-align: center; font-size: 0.75rem; font-weight: 700; color: #6e7681; z-index: 2; }
