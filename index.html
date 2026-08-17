@@ -25,7 +25,7 @@ body{display:flex;flex-direction:column}
 .dial{position:absolute;inset:7px;border-radius:50%;border:1px solid #2a333e;background:radial-gradient(circle at 50% 42%,#121820,#04070a 72%);box-shadow:inset 0 0 22px rgba(212,175,55,.055),0 7px 20px rgba(0,0,0,.5)}
 .marker{position:absolute;left:50%;top:50%;width:1px;height:44%;transform-origin:50% 0}.marker:after{content:"";display:block;width:1px;height:3px;background:#56606c}.marker.major:after{height:5px;background:#9b8540}
 .num{position:absolute;width:18px;height:18px;line-height:18px;text-align:center;font:700 10px Georgia,serif;color:#d9c676;transform:translate(-50%,-50%);z-index:2;text-shadow:0 0 5px rgba(212,175,55,.2)}
-.hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:6px;z-index:5;will-change:transform}.hour{width:3px;height:24px;margin-left:-1.5px;background:#f4f4f4}.minute{width:2px;height:33px;margin-left:-1px;background:#b7bec8}.second{width:1.2px;height:39px;margin-left:-.6px;background:var(--gold2);box-shadow:0 0 5px rgba(212,175,55,.8);z-index:7}
+.hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;border-radius:6px;z-index:5;will-change:transform;backface-visibility:hidden;transform-style:preserve-3d}.hour{width:3px;height:24px;margin-left:-1.5px;background:#f7f7f7;box-shadow:0 0 1px rgba(255,255,255,.35)}.minute{width:2px;height:33px;margin-left:-1px;background:#c9ced5;box-shadow:0 0 1px rgba(255,255,255,.22)}.second{width:1px;height:39px;margin-left:-.5px;background:var(--gold2);box-shadow:0 0 2px rgba(212,175,55,.55);z-index:7}
 .pin{position:absolute;left:50%;top:50%;width:7px;height:7px;transform:translate(-50%,-50%);border-radius:50%;background:var(--gold2);box-shadow:0 0 7px var(--gold);z-index:8}
 .clock-logo{position:absolute;left:50%;top:67%;transform:translate(-50%,-50%);width:25px;height:25px;object-fit:contain;opacity:.72;filter:drop-shadow(0 0 3px rgba(212,175,55,.2));z-index:1}
 .digital{font-size:21px;font-weight:700;color:#fff;text-shadow:0 0 7px rgba(255,255,255,.18);white-space:nowrap}.ampm{font-size:12px;color:var(--gold2);margin-left:2px}.date{font-size:12px;color:#c7cdd5;text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin-top:1px}.count{height:17px;margin-top:2px;font-size:10.5px;color:#aab2bd;letter-spacing:.55px;text-transform:uppercase;white-space:nowrap}.active .count{color:#d8c47c}
@@ -213,9 +213,6 @@ img.layer.show{animation:none!important}
 }
 
 
-}
-
-
 /* === FINAL V8: SHARP TEXT + TRUE ROUND/SQUARE SESSION PROGRESS === */
 .clocks{position:relative}
 .dial-mode-dot{
@@ -298,7 +295,6 @@ body.square-dials .dial-wrap .square-progress{
  width:10px!important;height:10px!important;z-index:100!important
 }
 /* Same elapsed-session progress in both shapes */
-.progress{stroke-width:3!important}
 body.square-dials .dial-wrap .square-progress{padding:3px!important}
 
 @media(max-width:900px){
@@ -319,7 +315,7 @@ body.square-dials .dial-wrap .square-progress{padding:3px!important}
 .track2 .welcome-tight{padding:0!important;word-spacing:0!important;letter-spacing:.05px!important}
 
 .live-brand{font-family:"Segoe UI",Arial,sans-serif!important;font-weight:600!important;letter-spacing:1px!important;text-rendering:geometricPrecision;-webkit-font-smoothing:antialiased}
-.second{transition:none!important;will-change:transform;backface-visibility:hidden}
+.second{transition:none!important}
 
 /* === FINAL MEDIA FIT V2 ===
    Desktop / TV / laptop: fill the media area completely.
@@ -346,6 +342,72 @@ body.square-dials .dial-wrap .square-progress{padding:3px!important}
 /* === TEXT SIZE SYNC: QUANTAGEN BOTTOM TICKER SIZE === */
 .track2 span{font-size:16px!important}
 @media(max-width:520px){.track2 span{font-size:14px!important}}
+
+
+/* =========================================================
+   NAZUK (DELICATE) DIAL, PROGRESS RING & PURE WHITE HANDS FIX
+   ========================================================= */
+.progress-svg{filter:none!important;-webkit-filter:none!important}
+.track{stroke-width:1.5px!important;stroke:#151a22!important}
+.progress{stroke-width:1.8px!important;stroke:#f2d779!important;filter:drop-shadow(0 0 2px rgba(242,215,121,.4))!important}
+.dial{
+  border:1px solid rgba(212,175,55,.18)!important;
+  box-shadow:inset 0 0 10px rgba(0,0,0,.8), 0 3px 8px rgba(0,0,0,.5)!important;
+  background:radial-gradient(circle at 50% 40%,#0f141a,#020406 80%)!important;
+}
+.num{font-weight:600!important;font-size:10px!important;text-shadow:none!important;color:#dcd098!important;opacity:0.9!important}
+.marker:after{background:#454d58!important}
+.marker.major:after{background:#c2a145!important}
+
+/* PURE WHITE HANDS - TV GPU FIX */
+.hand{
+  filter:none!important;
+  -webkit-filter:none!important;
+  text-shadow:none!important;
+  transform-origin:50% 100%!important;
+  backface-visibility:visible!important; /* Prevents black bug on TV */
+  will-change:auto!important;
+  border:none!important;
+  border-radius:3px!important;
+}
+.hour{
+  width:2.5px!important;
+  height:25px!important;
+  margin-left:-1.25px!important;
+  background:#ffffff!important;
+  box-shadow:0 0 1.5px #ffffff, 0 0 1px #ffffff!important;
+  z-index:15!important;
+}
+.minute{
+  width:1.8px!important;
+  height:38px!important;
+  margin-left:-0.9px!important;
+  background:#ffffff!important;
+  box-shadow:0 0 1.5px #ffffff, 0 0 1px #ffffff!important;
+  z-index:16!important;
+}
+.second{
+  width:1px!important;
+  height:43px!important;
+  margin-left:-0.5px!important;
+  background:#ffdb4d!important;
+  box-shadow:0 0 1.5px #ffdb4d!important;
+  z-index:20!important;
+}
+.pin{
+  width:5px!important;
+  height:5px!important;
+  background:#ffffff!important;
+  border:1.2px solid #d4af37!important;
+  box-shadow:0 0 4px rgba(212,175,55,0.9)!important;
+  z-index:25!important;
+}
+
+@media(max-width:900px){
+  .hour{height:20px!important;width:2.2px!important;margin-left:-1.1px!important}
+  .minute{height:32px!important;width:1.5px!important;margin-left:-0.75px!important}
+  .second{height:37px!important}
+}
 
 </style>
 </head>
@@ -379,7 +441,7 @@ body.square-dials .dial-wrap .square-progress{padding:3px!important}
 const CONFIG={
   DEFAULT_MODE:"IMAGES",
   VIDEO_FILE:"./sk_video.mp4",
-  IMAGES:["./img1.png","./img2.png","./img3.png","./img4.png","./img5.png","./img6.png"],
+  IMAGES:["./sk_01.jpg","./sk_02.jpg","./sk_03.jpg","./sk_04.jpg","./sk_05.jpg","./sk_06.jpg"],
   IMAGE_DURATION:9000
 };
 
