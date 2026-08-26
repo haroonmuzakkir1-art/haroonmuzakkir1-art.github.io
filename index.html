@@ -370,22 +370,22 @@ function clockSvg(){
     const r1=major?42:44.5, r2=47;
     const x1=50+Math.sin(a)*r1, y1=50-Math.cos(a)*r1;
     const x2=50+Math.sin(a)*r2, y2=50-Math.cos(a)*r2;
-    ticks += `<line class="tick ${major?'major':''}" x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}"/>`;
+    ticks += `<line class="tick ${major?'major':''}" x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${major?'#d9c07b':'#a39368'}" stroke-width="${major?'1.55':'1'}" opacity="0.82"/>`;
   }
   for(let n=1;n<=12;n++){
     const a=n*30*Math.PI/180, r=36;
     const x=50+Math.sin(a)*r, y=50-Math.cos(a)*r;
-    nums += `<text class="num" x="${x.toFixed(2)}" y="${y.toFixed(2)}">${n}</text>`;
+    nums += `<text class="num" x="${x.toFixed(2)}" y="${y.toFixed(2)}" fill="#e8dfbf" font-size="9.4" font-weight="700" text-anchor="middle" dominant-baseline="middle">${n}</text>`;
   }
-  return `<svg class="clock" viewBox="0 0 100 100" aria-hidden="true">
-    <rect class="face" x="1.5" y="1.5" width="97" height="97" rx="49"/>
-    <rect class="face-inner" x="5" y="5" width="90" height="90" rx="45"/>
+  return `<svg class="clock" viewBox="0 0 100 100" aria-hidden="true" style="background:transparent;overflow:visible">
+    <rect class="face" x="1.5" y="1.5" width="97" height="97" rx="49" fill="#06080b" stroke="#303640" stroke-width="2.5"/>
+    <rect class="face-inner" x="5" y="5" width="90" height="90" rx="45" fill="none" stroke="#6f6448" stroke-opacity="0.46" stroke-width="1.35"/>
     ${ticks}${nums}
-    <text class="brand-sk-face" x="50" y="28.2">SK</text>
-    <line class="hour-hand" x1="50" y1="52" x2="50" y2="29"/>
-    <line class="minute-hand" x1="50" y1="54" x2="50" y2="18"/>
-    <line class="second-hand" x1="50" y1="57" x2="50" y2="13"/>
-    <circle class="pin" cx="50" cy="50" r="2.8"/>
+    <text class="brand-sk-face" x="50" y="28.2" fill="#f3cf68">SK</text>
+    <line class="hour-hand" x1="50" y1="52" x2="50" y2="29" stroke="#e0bd67" stroke-width="5" stroke-linecap="round"/>
+    <line class="minute-hand" x1="50" y1="54" x2="50" y2="18" stroke="#f4d985" stroke-width="4" stroke-linecap="round"/>
+    <line class="second-hand" x1="50" y1="57" x2="50" y2="13" stroke="#36e59a" stroke-width="2.2" stroke-linecap="round"/>
+    <circle class="pin" cx="50" cy="50" r="2.8" fill="#f0c64f" stroke="#fff3be" stroke-width="1.3"/>
   </svg>`;
 }
 
